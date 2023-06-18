@@ -2,7 +2,7 @@
 
 namespace EventManager.Data.Entities.EntityBase
 {
-    public interface IHasCreationAudited
+    public interface IHasCreationAudited:IEntity
     {
        
         public DateTime CreationTime { get; set; }

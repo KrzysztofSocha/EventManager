@@ -3,7 +3,7 @@ using EventManager.Data.Entities.EntityBase;
 
 namespace EventManager.Data.Entities
 {
-    public class EventModel : IEntity, IHasCreationAudited
+    public class EventModel : IHasCreationAudited
     {
         public int Id { get; set; }
 
