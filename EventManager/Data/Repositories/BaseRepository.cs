@@ -32,26 +32,12 @@ namespace EventManager.Data.Repositories
 
         public async Task InsertAsync(T entity)
         {
-            
-            var entityType = typeof(T);
-            var creationTimeProp = entityType.GetProperty("CreationTime");
-            var creatorUserProp = entityType.GetProperty("CreatorUser");
-            var creatorUserIdProp = entityType.GetProperty("CreatorUserId");
-            if (creationTimeProp != null)
-                creationTimeProp.SetValue(entity, DateTime.Now);
-            if (creatorUserProp != null)
-            {
-                var currentUser = _httpContextAccessor.HttpContext.User; 
-                creatorUserProp.SetValue(entity, currentUser);
-            }
-            else if(creatorUserIdProp != null)
-            {
-                var currentUser = _httpContextAccessor.HttpContext.User;
-                creatorUserIdProp.SetValue(entity, currentUser.FindFirstValue(ClaimTypes.NameIdentifier));
-            }
+            HandleCreationAuditing(entity);
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
         }
+
+      
 
         public async Task UpdateAsync(T entity)
         {
@@ -61,5 +47,26 @@ namespace EventManager.Data.Repositories
             actual = entity;
             await _context.SaveChangesAsync();
         }
+        #region HandleAuditing
+        private void HandleCreationAuditing(T entity)
+        {
+            var entityType = typeof(T);
+            var creationTimeProp = entityType.GetProperty("CreationTime");
+            var creatorUserProp = entityType.GetProperty("CreatorUser");
+            var creatorUserIdProp = entityType.GetProperty("CreatorUserId");
+            if (creationTimeProp != null)
+                creationTimeProp.SetValue(entity, DateTime.Now);
+            if (creatorUserProp != null)
+            {
+                var currentUser = _httpContextAccessor.HttpContext.User;
+                creatorUserProp.SetValue(entity, currentUser);
+            }
+            else if (creatorUserIdProp != null)
+            {
+                var currentUser = _httpContextAccessor.HttpContext.User;
+                creatorUserIdProp.SetValue(entity, currentUser.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+        }
+        #endregion
     }
 }
