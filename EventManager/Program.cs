@@ -1,4 +1,7 @@
 using EventManager.Data;
+using EventManager.Data.Entities;
+using EventManager.Data.Entities.EntityBase;
+using EventManager.Data.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +16,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IRepository<EventModel>, BaseRepository<EventModel>>();
 
 var app = builder.Build();
 

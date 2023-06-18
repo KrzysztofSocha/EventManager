@@ -2,10 +2,11 @@
 
 namespace EventManager.Data.Repositories
 {
-    public interface IRepository
+    public interface IRepository<T> where T: IEntity
     {
-        void InsertAsync(IEntity entity);
-        IEntity GetByIdAsync(int id);
-
+        Task InsertAsync(T entity);
+        Task<T> GetByIdAsync(int id);
+        Task<IEnumerable<T>> GetAllListAsync();
+        Task UpdateAsync(T entity);
     }
 }
