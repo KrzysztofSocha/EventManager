@@ -20,6 +20,6 @@ namespace EventManager.Data.Entities
         [Required]
         public bool IsLimitReached { get; set; }
         public DateTime CreationTime { get; set; }
-        public string CreatorUserId { get; set; }
+        public string? CreatorUserId { get; set; }
     }
 }

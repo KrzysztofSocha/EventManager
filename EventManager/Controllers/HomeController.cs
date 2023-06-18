@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using EventManager.Data.Repositories;
 using EventManager.Data.Entities;
-using EventManager.Data.Entities.EntityBase;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventManager.Controllers
 {
@@ -30,7 +30,9 @@ namespace EventManager.Controllers
            
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             //await _userManager.GetClaimsAsync();
-            var events =await  _eventRepository.GetAllListAsync();
+            var events = await _eventRepository.GetAll().ToListAsync();
+            var eventa = new EventModel { Description="Test tworzenia", Name="test2", StartTime= DateTime.Now};
+            await _eventRepository.InsertAsync(eventa);
             return View();
         }
 

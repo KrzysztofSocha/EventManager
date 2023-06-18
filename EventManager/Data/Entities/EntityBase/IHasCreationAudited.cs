@@ -7,7 +7,7 @@ namespace EventManager.Data.Entities.EntityBase
        
         public DateTime CreationTime { get; set; }
         [MaxLength(450)]
-        public string CreatorUserId { get; set; }
+        public string? CreatorUserId { get; set; }
 
     }
 }
