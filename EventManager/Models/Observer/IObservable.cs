@@ -1,11 +1,11 @@
 ﻿namespace EventManager.Models.Observer
 {
-    public interface IObservable
+    public interface IObservable<T> where T :class, IObserver
     {
-        public IEnumerable<IObserver> Observers { get; set; }
-        void Attach(IObserver observer);
-        void Detach(IObserver observer);
-        Task SendNotify();
+        public ICollection<T> Observers { get;  }
+        void Attach(T observer);
+        void Detach(T observer);
+        void SendNotify(string value);
 
     }
 }

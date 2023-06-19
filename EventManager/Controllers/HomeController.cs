@@ -6,6 +6,7 @@ using System.Security.Claims;
 using EventManager.Data.Repositories;
 using EventManager.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using EventManager.Publishers;
 
 namespace EventManager.Controllers
 {
@@ -15,7 +16,7 @@ namespace EventManager.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IRepository<EventModel> _eventRepository;
-        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, 
+        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             IRepository<EventModel> eventRepository)
         {
@@ -27,12 +28,18 @@ namespace EventManager.Controllers
 
         public async Task<IActionResult> Index()
         {
-           
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             //await _userManager.GetClaimsAsync();
-            var events = await _eventRepository.GetAll().ToListAsync();
-            //var eventa = new EventModel { Description="Test tworzenia", Name="test2", StartTime= DateTime.Now};
-            //await _eventRepository.InsertAsync(eventa);
+            var eventa = await _eventRepository.GetAll().Include(x=>x.Observers).FirstAsync(x=>x.Id==7);
+            //if (eventa?.CreatorUserId != userId && userId != null)
+            //{
+            //   
+            //}
+            var publisher = new EventPublisher(eventa);
+            //    publisher.Attach(new EventUserModel(userId));
+            publisher.SendNotify("Test Powiadomienia 2");
+            await _eventRepository.UpdateAsync(eventa);
             return View();
         }
 

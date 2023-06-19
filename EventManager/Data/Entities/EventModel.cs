@@ -21,5 +21,14 @@ namespace EventManager.Data.Entities
         public bool IsLimitReached { get; set; }
         public DateTime CreationTime { get; set; }
         public string? CreatorUserId { get; set; }
+        public ICollection<EventUserModel> Observers { get;}
+        public ICollection<NotificationModel> Notifications { get;}
+        public EventModel()
+        {
+            Observers = new List<EventUserModel>();
+            Notifications = new List<NotificationModel>();
+        }
+
+       
     }
 }

@@ -2,6 +2,7 @@ using EventManager.Data;
 using EventManager.Data.Entities;
 using EventManager.Data.Entities.EntityBase;
 using EventManager.Data.Repositories;
+using EventManager.Publishers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IRepository<EventModel>, BaseRepository<EventModel>>();
+
 builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
