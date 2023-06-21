@@ -28,10 +28,10 @@ namespace EventManager.Controllers
 
         public async Task<IActionResult> Index()
         {
-
+            var date = DateTime.MinValue;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             //await _userManager.GetClaimsAsync();
-            var eventa = await _eventRepository.GetAll().Include(x=>x.Observers).FirstAsync(x=>x.Id==7);
+            var eventa = await _eventRepository.GetAll().Include(x=>x.Observers).Include(x=>x.Notifications).FirstAsync(x=>x.Id==7);
             //if (eventa?.CreatorUserId != userId && userId != null)
             //{
             //   

@@ -11,6 +11,7 @@ namespace EventManager.Data
         public DbSet<EventUserModel> EventUsers { get; set; }
         public DbSet<NotificationModel> Notifications { get; set; }
         public DbSet<UserNotificationModel> UserNotifications { get; set; }
+        public DbSet<EventAddressModel> EventAddresses { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

@@ -59,55 +59,59 @@ namespace EventManager.Data.Repositories
             return await _context.SaveChangesAsync();
         }
         #region HandleAuditing
-        private void HandleCreationAuditing(T entity)
+        private void HandleCreationAuditing(dynamic entity, List<Type> types =null, bool addToCheck = true)
         {
-            var entityType = typeof(T);
+            if (types == null)
+                types = new List<Type>();
+            Type entityType = entity.GetType();
+            if(addToCheck)
+                types.Add(entityType);
             var relatedAudited = entityType.GetProperties()
                 .Where(x => typeof(IHasCreationTime).IsAssignableFrom(x.PropertyType) ||
                 (x.PropertyType.IsGenericType &&
                  x.PropertyType.GetGenericArguments().Any(genericType => typeof(IHasCreationTime).IsAssignableFrom(genericType)))
                 || x.PropertyType.GetInterfaces().Contains(typeof(IHasCreationAudited))).ToList()/*Select(x => x.GetValue(entity))*/;
+           
             foreach (var prop in relatedAudited)
             {
                 var propValue = prop.GetValue(entity);
                 if (propValue != null)
                 {
                     if (propValue is IEnumerable auditedCollection)
-                    {
+                    {                      
                         foreach (var item in auditedCollection)
                         {
-                            if (item is T auditedItem)
-                            {
-                                HandleCreationAuditing(auditedItem);//dodać metodę dla elementów
-                            }
+                            if(!types.Any(t => t.Name == item.GetType().Name))                           
+                                HandleCreationAuditing(item, types, false);
                         }
+                        types.Add(entityType);
                     }
-                    else if (propValue is T auditedItem)
+                    else
                     {
-                        HandleCreationAuditing((T)auditedItem);
+                        if (!types.Any(t => t.Name == propValue.GetType().Name))
+                            HandleCreationAuditing(propValue, types, true);
                     }
+
+                       
+
                 }
             }
-                var creationTimeProp = entityType.GetProperty("CreationTime");
-                var creatorUserProp = entityType.GetProperty("CreatorUser");
-                var creatorUserIdProp = entityType.GetProperty("CreatorUserId");
+            var creationTimeProp = entityType.GetProperty("CreationTime");
+            var creatorUserProp = entityType.GetProperty("CreatorUser");
+            var creatorUserIdProp = entityType.GetProperty("CreatorUserId");
 
 
-                if (creationTimeProp != null && creationTimeProp.GetValue(entity) == null)
-                    creationTimeProp.SetValue(entity, DateTime.Now);
-                if (creatorUserProp != null && creatorUserProp.GetValue(entity) == null)
-                {
-                    var currentUser = _httpContextAccessor.HttpContext.User;
-                    creatorUserProp.SetValue(entity, currentUser);
-                }
-                else if (creatorUserIdProp != null && creatorUserIdProp.GetValue(entity) == null)
-                {
-                    var currentUser = _httpContextAccessor.HttpContext.User;
-                    creatorUserIdProp.SetValue(entity, currentUser.FindFirstValue(ClaimTypes.NameIdentifier));
-                }
+            if (creationTimeProp != null && creationTimeProp.GetValue(entity) == DateTime.MinValue)
+                creationTimeProp.SetValue(entity, DateTime.Now);
+        
+            if (creatorUserIdProp != null && string.IsNullOrEmpty(creatorUserIdProp.GetValue(entity)))
+            {
+                var currentUser = _httpContextAccessor.HttpContext.User;
+                creatorUserIdProp.SetValue(entity, currentUser.FindFirstValue(ClaimTypes.NameIdentifier));
             }
-
-
-            #endregion
         }
+
+
+        #endregion
     }
+}

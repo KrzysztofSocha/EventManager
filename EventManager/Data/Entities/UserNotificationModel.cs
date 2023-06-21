@@ -10,6 +10,6 @@ namespace EventManager.Data.Entities
         public IdentityUser User { get; set; }
         public int NotificationId { get; set; }
         public NotificationModel Notification { get; set; }
-        
+        public bool IsRead { get; set; }
     }
 }
