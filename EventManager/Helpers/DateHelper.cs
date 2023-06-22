@@ -8,22 +8,22 @@
             if (time.Days > 0)
             {
                 if (time.Days > 1)
-                    return time.Days.ToString() + " " + "dni temu";
+                    return time.Days.ToString() + " " + "days ago";
                 else
-                    return "dzień temu";
+                    return "day ago";
             }
             else if (time.Hours > 0)
             {
                 if (time.Hours > 1)
-                    return time.Hours.ToString() + " " + "godz. temu";
+                    return time.Hours.ToString() + " " + "hours ago";
                 else
-                    return "godzinę temu";
+                    return "hour ago";
             }
             else if (time.Minutes > 5)
             {
-                return time.Minutes.ToString() + " " + "minut temu";
+                return time.Minutes.ToString() + " " + "minutes ago";
             }
-            return "przed chwilą";
+            return "just now";
 
         }
     }

@@ -1,5 +1,9 @@
-﻿namespace EventManager.Models
+﻿using AutoMapper;
+using EventManager.Data.Entities;
+
+namespace EventManager.Models
 {
+    [AutoMap(typeof(EventModel))]
     public class GetEventDto
     {
         public int Id { get; set; }
@@ -22,12 +26,14 @@
         public List<GetSubscriberDto> Observers { get; set; }
         public List<EventMessagesDto> Notifications { get; set; }
     }
+    [AutoMap(typeof(EventUserModel))]
     public class GetSubscriberDto
     {
         public string Id { get; set; }
         public string FullName { get; set; }
         
     }
+    [AutoMap(typeof(NotificationModel))]
     public class EventMessagesDto
     {
         public int Id { get; set; }

@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 using EventManager.Data.Entities.EntityBase;
 
 namespace EventManager.Data.Entities
 {
+    
     public class EventModel : IHasCreationAudited
     {
         public int Id { get; set; }

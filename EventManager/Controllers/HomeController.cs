@@ -7,6 +7,7 @@ using EventManager.Data.Repositories;
 using EventManager.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using EventManager.Publishers;
+using AutoMapper;
 
 namespace EventManager.Controllers
 {
@@ -16,14 +17,17 @@ namespace EventManager.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IRepository<EventModel> _eventRepository;
+        private readonly IMapper _mapper;
         public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            IRepository<EventModel> eventRepository)
+            IRepository<EventModel> eventRepository,
+            IMapper mapper)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
             _eventRepository = eventRepository;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
@@ -36,10 +40,11 @@ namespace EventManager.Controllers
             //{
             //   
             //}
-            var publisher = new EventPublisher(eventa);
-            //    publisher.Attach(new EventUserModel(userId));
-            publisher.SendNotify("Test Powiadomienia 2");
-            await _eventRepository.UpdateAsync(eventa);
+            //var publisher = new EventPublisher(eventa);
+            ////    publisher.Attach(new EventUserModel(userId));
+            //publisher.SendNotify("Test Powiadomienia 2");
+            //await _eventRepository.UpdateAsync(eventa);
+            var output = _mapper.Map<GetEventDto>(eventa);
             return View();
         }
 
