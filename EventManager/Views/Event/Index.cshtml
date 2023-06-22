@@ -1,1 +1,134 @@
-﻿
+﻿@using System.Threading
+@using EventManager.Models.Events
+@{
+    ViewBag.Title = "Events";
+    ViewBag.CurrentPageName = "Events";
+}
+@model GetEventsViewModel;
+@section Scripts
+    {
+
+
+
+    <title></title>
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.117/styles/kendo.default-ocean-blue.min.css" />
+
+    <script src="https://kendo.cdn.telerik.com/2023.1.117/js/jquery.min.js"></script>
+
+
+
+    <script src="https://kendo.cdn.telerik.com/2023.1.117/js/kendo.all.min.js"></script>
+
+    <script src="https://kendo.cdn.telerik.com/2023.1.117/js/cultures/kendo.culture.en-GB.min.js"></script>
+
+    <script>
+
+        $("#datetimepicker").kendoDatePicker({
+            format: "dd-MM-yyyy",
+            dateInput: true,
+        });
+        $("#datetimepicker").val()
+    </script>
+}
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+
+                <div class="abp-advanced-search" style="margin-bottom:25px; min-width:27vw">
+                    <form asp-action="Index" asp-route-city=@Model.City class="form-horizontal">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-map-marker-alt"></i></span>
+                            </div>
+                            <input type="text" name="city" placeholder="City" class="form-control txt-search" value="@Model.City" />
+
+                        @if (Model.StartDate.HasValue)
+                        {
+                            <input type="text" class="form-control" id="datetimepicker" asp-for="StartDate" min="@DateTime.Now" value=@Model.StartDate.Value.ToString("dd-MM-yyyy") />
+
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="datetimepicker" asp-for="StartDate" min="@DateTime.Now" value=@DateTime.Now.ToString("dd-MM-yyyy") />
+
+                        }
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn  btn-outline-dark btn-search">
+                                <span class="fas fa-search" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <a class=" btn btn-outline-dark" style="margin-left: 35px; float:right" asp-action="Create">
+                    Create Event
+                </a>
+            </div>
+        </div>
+
+        @foreach (var item in @Model.Events)
+        {
+
+
+            <div class="row">
+                <div class=" card  mx-auto" style="background-color: #f8f9fa;margin: 10px auto; width:600px; margin-bottom:10px ">
+                    <div class="card-header" style="height:5px">
+                        @if (Model.CurrentUserId == item.CreatorUserId)
+                        {
+                            <div class="btn-group float-sm-right">
+                                <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" role="menu">
+
+
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="dropdown-item">Delete</a>
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="row card-body">
+
+
+                        <div class="col-sm-12">
+                            @if (!item.IsAnonymous)
+                            {
+                                <h6 style="color:#414042">@item.Author  </h6>
+                            }
+
+
+                            <a class=" mt-0" asp-action="EventDetails" asp-route-id=@item.Id style="color:#414042">
+                                <h3> @item.Name</h3>
+                                <h6>@item.StartTime.ToString("dd.MM.yyyy HH:mm")</h6>
+                                @if (item.FinishTime != null)
+                                {
+                                    <h6>@item.FinishTime.Value.ToString("dd.MM.yyyy HH:mm")</h6>
+                                }
+                                <h6><i class="fas fa-map-marker-alt"></i> @item.Address.City</h6>
+                                <p2>@item.Description</p2>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="row card-body">
+                        <div class="col-sm">
+                            @if (Model.CurrentUserId != item.CreatorUserId)
+                            {
+                                <a class="btn btn-lg btn-info float-right" asp-action="Join" asp-route-id="@item.Id">Subscribe</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+    </div>
+</div>
+
+

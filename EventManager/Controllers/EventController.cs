@@ -28,6 +28,8 @@ namespace EventManager.Controllers
 
         public async Task<IActionResult> Index(string city, DateTime? startDate)
         {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var user = await _userManager.FindByIdAsync(currentUserId);
             if (startDate == null)
                 city = "Rzeszów";
             if (startDate.HasValue && startDate.Value.Date == DateTime.Now.Date)
@@ -54,7 +56,8 @@ namespace EventManager.Controllers
             {
                 Events = output,
                 City = city,
-                StartDate = startDate
+                StartDate = startDate,
+                CurrentUserId=currentUserId
             };
             return View(model);
         }
@@ -66,7 +69,7 @@ namespace EventManager.Controllers
 
             if (currentUserId == query.First().CreatorUserId)
                 query.Include(x => x.Observers).ThenInclude(x => x.Observer);
-            var @event = query.FirstAsync();
+            var @event = await query.FirstAsync();
 
             var result = _mapper.Map<GetEventDto>(@event);
             if (!result.IsAnonymous)
@@ -117,6 +120,28 @@ namespace EventManager.Controllers
                 await _eventRepository.DeleteAsync(@event);
             }
             return View();
+        }
+        public async Task<IActionResult> UserEvents()
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result =await  _eventRepository.GetAll()
+                .Include(x => x.Address)
+                .Where(x => x.CreatorUserId == currentUserId)
+                .OrderByDescending(x => x.CreationTime).ToListAsync();
+            var output = _mapper.Map<List<GetEventDto>>(result);
+            return View(output);
+        }
+        public async Task<IActionResult> EventAttached()
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _eventRepository.GetAll()
+                .Include(x => x.Address)
+                .Include(x=>x.Observers)
+                .Where(x => x.Observers.Any(x=>x.ObserverId==currentUserId))
+                .OrderByDescending(x => x.CreationTime).ToListAsync();
+            var output = _mapper.Map<List<GetEventDto>>(result);
+            output.ForEach(x => x.Observers.Clear());
+            return View(output);
         }
 
     }
