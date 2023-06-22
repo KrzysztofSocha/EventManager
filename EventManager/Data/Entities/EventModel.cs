@@ -25,6 +25,7 @@ namespace EventManager.Data.Entities
         public string? CreatorUserId { get; set; }
         public ICollection<EventUserModel> Observers { get;}
         public ICollection<NotificationModel> Notifications { get;}
+        public EventAddressModel Address { get; set; }
         public EventModel()
         {
             Observers = new List<EventUserModel>();

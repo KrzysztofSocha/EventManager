@@ -8,6 +8,7 @@ using EventManager.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using EventManager.Publishers;
 using AutoMapper;
+using EventManager.Models.Events;
 
 namespace EventManager.Controllers
 {
@@ -35,7 +36,7 @@ namespace EventManager.Controllers
             var date = DateTime.MinValue;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             //await _userManager.GetClaimsAsync();
-            var eventa = await _eventRepository.GetAll().Include(x=>x.Observers).Include(x=>x.Notifications).FirstAsync(x=>x.Id==7);
+            var eventa = await _eventRepository.GetAll().Include(x=>x.Observers).ThenInclude(x=>x.Observer).Include(x=>x.Notifications).FirstAsync(x=>x.Id==7);
             //if (eventa?.CreatorUserId != userId && userId != null)
             //{
             //   

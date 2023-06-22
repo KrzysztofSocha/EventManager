@@ -58,30 +58,43 @@ namespace EventManager.Data.Repositories
             await _context.Set<T>().AddAsync(entity);
             return await _context.SaveChangesAsync();
         }
+        public async Task DeleteAsync(int id)
+        {
+            var entity = await _context.Set<T>().FirstAsync(x => x.Id == id);
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+    
         #region HandleAuditing
-        private void HandleCreationAuditing(dynamic entity, List<Type> types =null, bool addToCheck = true)
+        private void HandleCreationAuditing(dynamic entity, List<Type> types = null, bool addToCheck = true)
         {
             if (types == null)
                 types = new List<Type>();
             Type entityType = entity.GetType();
-            if(addToCheck)
+            if (addToCheck)
                 types.Add(entityType);
             var relatedAudited = entityType.GetProperties()
                 .Where(x => typeof(IHasCreationTime).IsAssignableFrom(x.PropertyType) ||
                 (x.PropertyType.IsGenericType &&
                  x.PropertyType.GetGenericArguments().Any(genericType => typeof(IHasCreationTime).IsAssignableFrom(genericType)))
                 || x.PropertyType.GetInterfaces().Contains(typeof(IHasCreationAudited))).ToList()/*Select(x => x.GetValue(entity))*/;
-           
+
             foreach (var prop in relatedAudited)
             {
                 var propValue = prop.GetValue(entity);
                 if (propValue != null)
                 {
                     if (propValue is IEnumerable auditedCollection)
-                    {                      
+                    {
                         foreach (var item in auditedCollection)
                         {
-                            if(!types.Any(t => t.Name == item.GetType().Name))                           
+                            if (!types.Any(t => t.Name == item.GetType().Name))
                                 HandleCreationAuditing(item, types, false);
                         }
                         types.Add(entityType);
@@ -92,7 +105,7 @@ namespace EventManager.Data.Repositories
                             HandleCreationAuditing(propValue, types, true);
                     }
 
-                       
+
 
                 }
             }
@@ -103,13 +116,15 @@ namespace EventManager.Data.Repositories
 
             if (creationTimeProp != null && creationTimeProp.GetValue(entity) == DateTime.MinValue)
                 creationTimeProp.SetValue(entity, DateTime.Now);
-        
+
             if (creatorUserIdProp != null && string.IsNullOrEmpty(creatorUserIdProp.GetValue(entity)))
             {
                 var currentUser = _httpContextAccessor.HttpContext.User;
                 creatorUserIdProp.SetValue(entity, currentUser.FindFirstValue(ClaimTypes.NameIdentifier));
             }
         }
+
+
 
 
         #endregion

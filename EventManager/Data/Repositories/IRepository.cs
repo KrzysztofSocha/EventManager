@@ -11,5 +11,7 @@ namespace EventManager.Data.Repositories
         Task<IEnumerable<T>> GetAllListAsync();
         IQueryable<T> GetAll();
         Task UpdateAsync(T entity);
+        Task DeleteAsync(int id);
+        Task DeleteAsync(T entity);
     }
 }
