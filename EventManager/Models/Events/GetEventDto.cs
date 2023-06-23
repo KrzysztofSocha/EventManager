@@ -22,6 +22,7 @@ namespace EventManager.Models.Events
         public bool IsAnonymous { get; set; }
 
         public string Author { get; set; }
+        public bool IsSubscribe { get; set; }
 
         public List<GetSubscriberDto> Observers { get; set; }
         public List<EventMessagesDto> Notifications { get; set; }

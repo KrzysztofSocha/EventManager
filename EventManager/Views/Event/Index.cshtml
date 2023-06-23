@@ -117,9 +117,19 @@
 
                     <div class="row card-body">
                         <div class="col-sm">
-                            @if (Model.CurrentUserId != item.CreatorUserId)
+                            @if (Model.CurrentUserId != item.CreatorUserId && !item.IsSubscribe)
                             {
-                                <a class="btn btn-lg btn-info float-right" asp-action="Join" asp-route-id="@item.Id">Subscribe</a>
+                                @if(Model.CurrentUserId==null)
+                                {
+                                    <button disabled class="btn btn-lg btn-info float-right"  @*asp-action="Subscribe" asp-route-id="@item.Id"*@>Subscribe</button>
+                                }
+                                else{
+                                    <a class="btn btn-lg btn-info float-right" asp-action="Subscribe" asp-route-id="@item.Id">Subscribe</a>
+                                }
+                               
+                            }
+                            else if (item.IsSubscribe){
+                                <a class="btn btn-lg btn-secondary float-right" asp-action="Unsubscribe" asp-route-id="@item.Id">Unsubscribe</a>
                             }
                         </div>
                     </div>

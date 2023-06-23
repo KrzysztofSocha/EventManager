@@ -34,7 +34,7 @@ namespace EventManager.Controllers
                 city = "Rzeszów";
             if (startDate.HasValue && startDate.Value.Date == DateTime.Now.Date)
                 startDate = null;
-            var avaialableEvents = _eventRepository.GetAll().Include(x => x.Address)
+            var avaialableEvents = _eventRepository.GetAll().Include(x => x.Address).Include(x=>x.Observers)
                 .Where(x => x.StartTime >= DateTime.Now || (x.FinishTime.HasValue && x.FinishTime.Value >= DateTime.Now));
             if (!string.IsNullOrEmpty(city))
                 avaialableEvents = avaialableEvents.Where(x => x.Address.City.Contains(city));
@@ -45,6 +45,8 @@ namespace EventManager.Controllers
             var output = _mapper.Map<List<GetEventDto>>(result);
             foreach (var item in output)
             {
+                item.IsSubscribe = item.Observers.Any(x => x.Id == currentUserId);
+                item.Observers.Clear();
                 if (!item.IsAnonymous)
                 {
                     var user = await _userManager.FindByIdAsync(item.CreatorUserId);
@@ -95,7 +97,7 @@ namespace EventManager.Controllers
             var publisher = new EventPublisher(@event);
             publisher.Detach(new EventUserModel(currentUserId));
             await _eventRepository.UpdateAsync(@event);
-            return View();
+            return RedirectToAction("Index");
         }
         public async Task<IActionResult> AddNotify(int id, string message)
         {
