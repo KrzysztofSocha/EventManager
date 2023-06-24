@@ -5,7 +5,7 @@ namespace EventManager.Publishers
 {
     public class EventPublisher : BasePublisher<EventUserModel>
     {
-        public ICollection<EventUserModel> Observers /*= new List<EventUserModel>()*/;
+        //public ICollection<EventUserModel> Observers /*= new List<EventUserModel>()*/;
         private EventModel _event;
 
         //private readonly IHttpContextAccessor _httpContextAccessor;
@@ -18,7 +18,7 @@ namespace EventManager.Publishers
         public EventPublisher(EventModel @event):base(@event.Observers)
         {
             _event = @event;
-            Observers =base.Observers;
+            //Observers =base.Observers;
         }
         //public void SetCurrentEvent(EventModel @event)
         //{
