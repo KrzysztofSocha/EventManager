@@ -1,0 +1,140 @@
+﻿@using EventManager.Models.Events
+@using System.Security.Claims
+
+@model GetEventDto
+<div class=" card  mx-auto" style="background-color: #f8f9fa;margin: 10px auto; width:35vw; margin-bottom:10px ">
+    @if (Model.CreatorUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+    {
+        <div class="card-header" style="height: 10px; display: flex; justify-content: center; align-items: center;">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-link" style="position: absolute; right: 10px;">
+                <i class="fas fa-edit"></i>
+            </a>
+        </div>
+
+    }
+    <div class=" card-body">
+
+
+        @if (!Model.IsAnonymous)
+        {
+            <h4 style="color:#414042">@Model.Author  </h4>
+        }
+        @* <div class="row card-body" style="margin-top:0px">
+
+        <div class="col-sm-9" style="margin-left:35px">*@
+        <p5 class="text-muted"><small>@Model.SharingTime</small></p5>
+
+        <h3> @Model.Name</h3>
+        @if (Model.FinishTime == null)
+        {
+            <h6>@Model.StartTime.ToString("dd.MM.yyyy HH:mm")</h6>
+        }
+        else
+        {
+            <h6>@Model.StartTime.ToString("dd.MM.yyyy HH:mm")-@Model.FinishTime.Value.ToString("dd.MM.yyyy HH:mm")</h6>
+        }
+
+        <h6><i class="fas fa-map-marker-alt"></i> @Model.Address.City</h6>
+        <p2>@Model.Description</p2>
+        @*      </div>
+        </div>*@
+
+
+        <div class="row card-body">
+            <div class="col-sm-5">
+                <H5>Subcribers</H5>
+                <p>     <i class="fas fa-user-check"></i> @Model.SubcribersCount</p>
+
+            </div>
+            <div class="col-sm-7">
+                <H5>Address</H5>
+                <p2>@Model.Address.City @Model.Address.Address</p2>
+                @if (Model.Address.DescriptionPlace != null)
+                {
+                    <H5>DescriptionPlace</H5>
+                    <p2> @Model.Address.DescriptionPlace</p2>
+                }
+            </div>
+        </div>
+        <div class="row card-body">
+            <div class="col overflow-auto col-sm-8" style="max-height:40vh">
+                @foreach (var message in Model.Notifications)
+                {
+
+                    <div class="card" style="margin-top:5px; background-color: #f8f9fa;width:auto; ">
+                        <div class="row card-body">
+
+
+                            <div class="col col-sm-9" style="margin-left:7px">
+
+                                <p3 class="text-muted"><small>@message.SharingTime</small></p3>
+                                <p>@message.Message</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                }
+                @if (Model.CreatorUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                {
+                    <div class="row card-body">
+
+                        <form method="post" asp-action="AddNotify">
+
+                            <div class="form-group">
+                                <textarea class="form-control" style="width:19vw" name="message" rows="3"></textarea>
+                            </div>
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn-sm btn-outline-dark">Send</button>
+                        </form>
+
+                    </div>
+                }
+
+
+            </div>
+            @if (Model.CreatorUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+
+                @if (Model.Observers.Count > 0)
+                {
+                    <div class="col overflow-auto col-sm-4" style="max-height:35vh">
+                        @foreach (var user in Model.Observers)
+                        {
+                            <div class="card" style="margin-top:5px; background-color: #f8f9fa;width:auto; ">
+                                <div class="row card-body">
+                                    <div style="margin-top: 3px">
+                                        <h6 style="color:#414042">@user.FullName</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+            }
+
+           
+        </div>
+    </div>
+
+
+    <div class="row card-body">
+
+        @if (User.FindFirstValue(ClaimTypes.NameIdentifier) != Model.CreatorUserId && !Model.IsSubscribe && User.FindFirstValue(ClaimTypes.NameIdentifier) != null)
+        {
+            <a class="btn btn-lg btn-info float-right" asp-action="Subscribe" asp-route-id="@Model.Id">Subscribe</a>
+        }
+        else if (Model.IsSubscribe && Model.StartTime > DateTime.Now)
+        {
+
+            <a class="btn btn-lg btn-light float-right" asp-action="Unsubscribe" asp-route-id="@Model.Id">Unsubscribe</a>
+
+        }
+
+    </div>
+</div>
+
+
+
+

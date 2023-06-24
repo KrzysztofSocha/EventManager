@@ -26,6 +26,7 @@ namespace EventManager.Models.Events
 
         public List<GetSubscriberDto> Observers { get; set; }
         public List<EventMessagesDto> Notifications { get; set; }
+        public int SubcribersCount { get; set; }
     }
     //[AutoMap(typeof(EventUserModel))]
     public class GetSubscriberDto

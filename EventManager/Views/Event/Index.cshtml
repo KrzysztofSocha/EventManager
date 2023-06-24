@@ -74,26 +74,18 @@
 
             <div class="row">
                 <div class=" card  mx-auto" style="background-color: #f8f9fa;margin: 10px auto; width:600px; margin-bottom:10px ">
-                    <div class="card-header" style="height:5px">
-                        @if (Model.CurrentUserId == item.CreatorUserId)
-                        {
-                            <div class="btn-group float-sm-right">
-                                <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right" role="menu">
+                    @if (item.CreatorUserId == Model.CurrentUserId)
+                    {
+                        <div class="card-header" style="height: 10px; display: flex; justify-content: center; align-items: center;">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-link" style="position: absolute; right: 10px;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
 
-
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">Edit</a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="dropdown-item">Delete</a>
-
-                                </div>
-                            </div>
-                        }
-                    </div>
+                    }
                     <div class="row card-body">
 
-
+                       
                         <div class="col-sm-12">
                             @if (!item.IsAnonymous)
                             {

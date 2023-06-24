@@ -15,10 +15,10 @@ namespace EventManager.Publishers
         //    _httpContextAccessor = httpContextAccessor;
 
         //}
-        public EventPublisher(EventModel @event)//:base(@event.Observers)
+        public EventPublisher(EventModel @event):base(@event.Observers)
         {
             _event = @event;
-            Observers = @event.Observers;
+            Observers =base.Observers;
         }
         //public void SetCurrentEvent(EventModel @event)
         //{
@@ -35,8 +35,13 @@ namespace EventManager.Publishers
 
         public override void Detach(EventUserModel observer)
         {
-            if (Observers.Any(x => x.ObserverId != observer.ObserverId))
+            //var sub = Observers.FirstOrDefault(x => x.ObserverId == observer.ObserverId);
+            if (Observers.Any(x=>x.ObserverId==observer.ObserverId))
+            {
                 base.Detach(observer);
+            }
+           
+
         }
 
         public override void SendNotify(string value)

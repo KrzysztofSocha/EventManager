@@ -45,7 +45,7 @@ namespace EventManager.Controllers
             var output = _mapper.Map<List<GetEventDto>>(result);
             foreach (var item in output)
             {
-                item.IsSubscribe = item.Observers.Any(x => x.Id == currentUserId);
+                item.IsSubscribe = item.Observers.Any(x => x.Id == currentUserId);                
                 item.Observers.Clear();
                 if (!item.IsAnonymous)
                 {
@@ -66,14 +66,17 @@ namespace EventManager.Controllers
         public async Task<IActionResult> EventDetails(int id)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var query = _eventRepository.GetAll().Include(x => x.Address)
-                .Include(x => x.Notifications).Where(x => x.Id == id);
-
-            if (currentUserId == query.First().CreatorUserId)
-                query.Include(x => x.Observers).ThenInclude(x => x.Observer);
-            var @event = await query.FirstAsync();
+            var @event = await _eventRepository.GetAll().Include(x => x.Address)
+                .Include(x => x.Notifications.OrderByDescending(x=>x.CreationTime))
+                .Include(x => x.Observers).ThenInclude(x => x.Observer).FirstAsync(x => x.Id == id);        
+           
+                
 
             var result = _mapper.Map<GetEventDto>(@event);
+            result.IsSubscribe = result.Observers.Any(x => x.Id == currentUserId);
+            
+            if (currentUserId != @event.CreatorUserId)
+                result.Observers.Clear();
             if (!result.IsAnonymous)
             {
                 var user = await _userManager.FindByIdAsync(result.CreatorUserId);
@@ -84,19 +87,25 @@ namespace EventManager.Controllers
         public async Task<IActionResult> Subscribe(int id)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var @event = await _eventRepository.GetByIdAsync(id);
+            var @event = await _eventRepository.GetAll().Include(x=>x.Observers).FirstAsync(x=>x.Id==id);
             var publisher = new EventPublisher(@event);
             publisher.Attach(new EventUserModel(currentUserId));
             await _eventRepository.UpdateAsync(@event);
-            return View();
+            return RedirectToAction("Index");
         }
         public async Task<IActionResult> Unsubscribe(int id)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var @event = await _eventRepository.GetByIdAsync(id);
-            var publisher = new EventPublisher(@event);
-            publisher.Detach(new EventUserModel(currentUserId));
-            await _eventRepository.UpdateAsync(@event);
+            var @event = await _eventRepository.GetAll().Include(x => x.Observers).FirstAsync(x => x.Id == id);
+            var sub = @event.Observers.FirstOrDefault(x => x.ObserverId == currentUserId);
+            if(sub != null)
+            {
+                var publisher = new EventPublisher(@event);
+                publisher.Detach(sub);
+                await _eventRepository.UpdateAsync(@event);
+            }
+
+           
             return RedirectToAction("Index");
         }
         public async Task<IActionResult> AddNotify(int id, string message)

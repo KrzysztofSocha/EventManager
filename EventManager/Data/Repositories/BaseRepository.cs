@@ -49,7 +49,8 @@ namespace EventManager.Data.Repositories
             if (actual == null)
                 throw new Exception("Record with the specified ID was not found.");
             HandleCreationAuditing(entity);
-            actual = entity;
+            //actual = entity;
+            _context.Set<T>().Update(entity);
             await _context.SaveChangesAsync();
         }
         public async Task<int> InsertAndGetIdAsync(T entity)
