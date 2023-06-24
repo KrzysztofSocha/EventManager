@@ -1,0 +1,40 @@
+﻿@using EventManager.Models.Notification;
+@model List<NotificationViewModel>
+<div class="content-header">
+    <div class="container-fluid">
+
+
+        @foreach (var item in @Model)
+        {
+            if (@item.IsRead)
+            {
+                <div class="card " style="width:350px; margin-top:15px; margin-left:4vw; background-color: #f8f9fa;">
+
+                    <div class="card-body">
+                        <a asp-controller="Event" asp-action="EventDetails" asp-route-id="@item.EventId"><h5>@item.EventName</h5></a>
+                        <p7>@item.SharingTime</p7>
+                        <p5>@item.Message</p5>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card " style="width:350px; margin-top:15px;margin-left:4vw;  background-color: #f8f9fa; border: 2px solid black;">
+
+                    <div class="card-body">
+                        <a asp-controller="Event" asp-action="EventDetails" asp-route-id="@item.EventId">
+                            <h5>@item.EventName</h5></a>
+                        <p7>@item.SharingTime</p7>
+                        <p5>@item.Message</p5>
+                    </div>
+                </div>
+
+            }
+        }
+    </div>
+</div>
+
+
+
+
+

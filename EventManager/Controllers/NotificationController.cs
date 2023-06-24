@@ -20,8 +20,8 @@ namespace EventManager.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var notifications = await _userNotificationRepository.GetAll().AsNoTracking()
-                .Include(x => x.Notification)
+            var notifications = await _userNotificationRepository.GetAll()
+                .Include(x => x.Notification).ThenInclude(x=>x.Event).AsNoTracking()
                 .Where(x => x.UserId == currentUserId).ToListAsync();
             var output = _mapper.Map<List<NotificationViewModel>>(notifications);
             return View(output);

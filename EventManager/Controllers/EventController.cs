@@ -82,6 +82,7 @@ namespace EventManager.Controllers
                 var user = await _userManager.FindByIdAsync(result.CreatorUserId);
                 result.Author = user.UserName;
             }
+           
             return View(result);
         }
         public async Task<IActionResult> Subscribe(int id)
