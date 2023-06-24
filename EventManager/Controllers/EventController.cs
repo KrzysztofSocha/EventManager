@@ -111,7 +111,7 @@ namespace EventManager.Controllers
         public async Task<IActionResult> AddNotify(int id, string message)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var @event = await _eventRepository.GetByIdAsync(id);
+            var @event = await _eventRepository.GetAll().Include(x=>x.Observers).FirstOrDefaultAsync(x=>x.Id==id);
            
             if(currentUserId == @event.CreatorUserId)
             {
@@ -119,8 +119,8 @@ namespace EventManager.Controllers
                 publisher.SendNotify(message);
                 await _eventRepository.UpdateAsync(@event);
             }
-            
-            return View();
+
+            return RedirectToAction("EventDetails", new { id = id });
         }
         public async Task<IActionResult> Delete(int id)
         {
