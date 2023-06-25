@@ -9,6 +9,7 @@ using EventManager.Models.Events;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using EventManager.Publishers;
+using EventManager.Handlers;
 
 namespace EventManager.Controllers
 {
@@ -154,6 +155,24 @@ namespace EventManager.Controllers
             var output = _mapper.Map<List<GetEventDto>>(result);
             output.ForEach(x => x.Observers.Clear());
             return View(output);
+        }
+        public async Task<IActionResult> Edit (int id)
+        {
+            var @event = await _eventRepository.GetAll().Include(x => x.Address).FirstOrDefaultAsync(x => x.Id == id);
+            if (@event != null)
+                return View(_mapper.Map<CreateOrUpdateEventDto>(@event));
+            else
+                return RedirectToAction("Index");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(CreateOrUpdateEventDto model)
+        {
+
+            var @event = _mapper.Map<EventModel>(model);
+            var resultHandler = new ResultHandler<EventModel>(null);
+            return RedirectToAction("Index");
+
         }
 
     }

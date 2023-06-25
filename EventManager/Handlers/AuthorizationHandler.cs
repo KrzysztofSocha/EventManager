@@ -27,8 +27,9 @@ namespace EventManager.Handlers
                     _next.Handle(model);
                     return;
                 }
+                throw new Exception("You have no permissions to this operation");
             }
-            throw new Exception("You have no permissions to this operation");
+            
         }
     }
 }

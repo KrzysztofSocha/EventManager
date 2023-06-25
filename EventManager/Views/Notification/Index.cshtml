@@ -11,9 +11,20 @@
                 <div class="card " style="width:350px; margin-top:15px; margin-left:4vw; background-color: #f8f9fa;">
 
                     <div class="card-body">
-                        <a asp-controller="Event" asp-action="EventDetails" asp-route-id="@item.EventId"><h5>@item.EventName</h5></a>
-                        <p7>@item.SharingTime</p7>
-                        <p5>@item.Message</p5>
+                        <div class="row card-body">
+                            <div class="col-sm-8">
+                                <a asp-controller="Event" asp-action="EventDetails" asp-route-id="@item.EventId">
+                                    <h5 style="color:#414042">@item.EventName</h5>
+                                </a>
+                                <p7>@item.SharingTime<br></p7>
+                                <p2>@item.Message</p2>
+                            </div>
+                            <div class="col-sm-4">
+                                <a asp-action="Remove" asp-route-id="@item.Id" class="btn btn-link" style="position: absolute; right: 10px;">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             }
@@ -22,10 +33,20 @@
                 <div class="card " style="width:350px; margin-top:15px;margin-left:4vw;  background-color: #f8f9fa; border: 2px solid black;">
 
                     <div class="card-body">
-                        <a asp-controller="Event" asp-action="EventDetails" asp-route-id="@item.EventId">
-                            <h5>@item.EventName</h5></a>
-                        <p7>@item.SharingTime</p7>
-                        <p5>@item.Message</p5>
+                        <div class="row card-body">
+                            <div class="col-sm-8">
+                                <a asp-controller="Event" asp-action="EventDetails" asp-route-id="@item.EventId">
+                                    <h5 style="color:#414042">@item.EventName</h5>
+                                </a>
+                                <p7>@item.SharingTime<br></p7>
+                                <p2>@item.Message</p2>
+                            </div>
+                            <div class="col-sm-4">
+                                <a asp-action="Remove" asp-route-id="@item.Id" class="btn btn-link" style="position: absolute; right: 10px;">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

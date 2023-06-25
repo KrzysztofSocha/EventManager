@@ -12,7 +12,7 @@ namespace EventManager.Models.Notification
                 .ForMember(dest => dest.EventId, opt => opt.MapFrom(src => src.Notification.EventId))
                 .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Notification.Message))
                 .ForMember(dest => dest.SharingTime, opt => opt.MapFrom(src => DateHelper.GetTaskTimeString(src.Notification.CreationTime)))
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Notification.Id))
+                //.ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Notification.Id))
                 .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Notification.Event.Name));
         }
     }

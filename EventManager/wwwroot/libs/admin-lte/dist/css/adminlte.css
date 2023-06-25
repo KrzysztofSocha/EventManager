@@ -35910,7 +35910,7 @@ body.iframe-mode-fullscreen .content-wrapper.iframe-mode {
 }
 
 .content-wrapper.kanban .card.card-row .card .card-body {
-  padding: .75rem;
+  padding: 0rem;
 }
 
 .content-wrapper.kanban .btn-tool.btn-link {
