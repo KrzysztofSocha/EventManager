@@ -1,0 +1,133 @@
+﻿@using EventManager.Models.Events;
+@model CreateOrUpdateEventDto;
+@section Scripts
+    {
+
+
+
+    <title></title>
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.117/styles/kendo.default-ocean-blue.min.css" />
+
+    <script src="https://kendo.cdn.telerik.com/2023.1.117/js/jquery.min.js"></script>
+
+
+
+    <script src="https://kendo.cdn.telerik.com/2023.1.117/js/kendo.all.min.js"></script>
+
+    <script src="https://kendo.cdn.telerik.com/2023.1.117/js/cultures/kendo.culture.en-GB.min.js"></script>
+
+
+    <script>
+        $('#isAnonymous').kendoCheckBox({
+            checked: false,
+
+        });
+
+        $(document).ready(function () {
+
+            $("#datetimeend").kendoDateTimePicker({
+                format: "yyyy-MM-dd HH:mm",
+                dateInput: true,
+                min: kendo.date.today(),
+            });
+            $("#datetimepicker").kendoDateTimePicker({
+                format: "yyyy-MM-dd HH:mm",
+                dateInput: true,
+                min: kendo.date.today(),
+            });
+            $("#numeric").kendoNumericTextBox({
+                label: "Set currently in stock"
+            });
+
+
+
+        });
+        function changeValue(checkbox) {
+            document.getElementById("isAnonymousHidden").value = checkbox.checked;
+        }
+
+    </script>
+}
+
+
+
+
+    <div class="container  h-100" style="width:auto;">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-lg-9 col-xl-7">
+
+                <h2>Craete Event</h2>
+
+                <form class="form-horizontal" method="post" id="createEvent" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="form-group  col-sm-6 my-1">
+                            <label>Start Time</label>
+                            <input type="text" class="form-control" id="datetimepicker" asp-for="StartTime" value=@Model.StartTime.ToString("yyyy-MM-dd HH:mm") />
+                        </div>
+                        <div class="form-group  col-sm-6 my-1" style="float:right">
+                            <label>Finish Time</label>
+                        @if (Model.FinishTime == null)
+                        {
+                            <input type="text" class="form-control" id="datetimeend" asp-for="FinishTime" value=@DateTime.Now.ToString("yyyy-MM-dd HH:mm") />
+
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="datetimeend" asp-for="FinishTime" value=@Model.FinishTime.Value.ToString("yyyy-MM-dd HH:mm") />
+
+                        }
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-sm-4 my-1" style="margin-top:50px">
+
+                        <div class="form-group" style="margin-top:35px; margin-left:15px">
+
+                            <label for="IsAnonymous">Is Anonymous</label>
+                            <input type="hidden" id="isAnonymousHidden" asp-for="IsAnonymous" value="@Model.IsAnonymous" />
+                            <input type="checkbox" id="isAnonymous" class="form-control" onchange="changeValue(this)" />
+
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-8 my-1">
+
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" id="title" asp-for="Name" value="@Model.Name" />
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" asp-for="Description" rows="3">@Model.Description</textarea>
+                </div>
+
+
+
+
+
+                <div class="row">
+                    <div class="form-group col-sm-5 my-1">
+                        <label for="city">City</label>
+                        <input type="text" id="city" class="form-control" asp-for="Address.City" value="@Model.Address.City" />
+                    </div>
+                    <div class="form-group col-sm-7 my-1">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" asp-for="Address.Address" value="@Model.Address.Address" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descriptionplace">DescriptionPlace</label>
+                    <textarea class="form-control" id="description" asp-for="Address.DescriptionPlace" rows="3">@Model.Address.DescriptionPlace</textarea>
+                </div>
+
+                
+                <button type="submit" class="btn btn-primary" style="float:right">Save</button>
+                <a asp-action="Index" class="btn btn-danger" style="float:left; margin-bottom:50px">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+

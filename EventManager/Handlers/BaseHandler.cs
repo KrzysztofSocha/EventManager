@@ -1,14 +1,16 @@
 ﻿namespace EventManager.Handlers
 {
-    public abstract class BaseHandler<TModel>:IHandler<TModel>
+    public abstract class BaseHandler:IHandler
     {
-        protected IHandler<TModel> _next;
-        protected BaseHandler(IHandler<TModel> next)
+        protected IHandler _next;
+       
+        protected BaseHandler(IHandler next)
         {
             _next = next;
+           
         }
 
-        public abstract void Handle(TModel model);
+        public abstract void Handle(object model);
         
     }
 }

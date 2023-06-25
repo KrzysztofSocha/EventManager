@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using EventManager.Publishers;
 using EventManager.Handlers;
+using NuGet.Protocol.Core.Types;
 
 namespace EventManager.Controllers
 {
@@ -35,7 +36,7 @@ namespace EventManager.Controllers
                 city = "Rzeszów";
             if (startDate.HasValue && startDate.Value.Date == DateTime.Now.Date)
                 startDate = null;
-            var avaialableEvents = _eventRepository.GetAll().Include(x => x.Address).Include(x=>x.Observers)
+            var avaialableEvents = _eventRepository.GetAll().Include(x => x.Address).Include(x => x.Observers)
                 .Where(x => x.StartTime >= DateTime.Now || (x.FinishTime.HasValue && x.FinishTime.Value >= DateTime.Now));
             if (!string.IsNullOrEmpty(city))
                 avaialableEvents = avaialableEvents.Where(x => x.Address.City.Contains(city));
@@ -46,7 +47,7 @@ namespace EventManager.Controllers
             var output = _mapper.Map<List<GetEventDto>>(result);
             foreach (var item in output)
             {
-                item.IsSubscribe = item.Observers.Any(x => x.Id == currentUserId);                
+                item.IsSubscribe = item.Observers.Any(x => x.Id == currentUserId);
                 item.Observers.Clear();
                 if (!item.IsAnonymous)
                 {
@@ -60,7 +61,7 @@ namespace EventManager.Controllers
                 Events = output,
                 City = city,
                 StartDate = startDate,
-                CurrentUserId=currentUserId
+                CurrentUserId = currentUserId
             };
             return View(model);
         }
@@ -68,14 +69,14 @@ namespace EventManager.Controllers
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var @event = await _eventRepository.GetAll().Include(x => x.Address)
-                .Include(x => x.Notifications.OrderByDescending(x=>x.CreationTime))
-                .Include(x => x.Observers).ThenInclude(x => x.Observer).FirstAsync(x => x.Id == id);        
-           
-                
+                .Include(x => x.Notifications.OrderByDescending(x => x.CreationTime))
+                .Include(x => x.Observers).ThenInclude(x => x.Observer).FirstAsync(x => x.Id == id);
+
+
 
             var result = _mapper.Map<GetEventDto>(@event);
             result.IsSubscribe = result.Observers.Any(x => x.Id == currentUserId);
-            
+
             if (currentUserId != @event.CreatorUserId)
                 result.Observers.Clear();
             if (!result.IsAnonymous)
@@ -83,13 +84,13 @@ namespace EventManager.Controllers
                 var user = await _userManager.FindByIdAsync(result.CreatorUserId);
                 result.Author = user.UserName;
             }
-           
+
             return View(result);
         }
         public async Task<IActionResult> Subscribe(int id)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var @event = await _eventRepository.GetAll().Include(x=>x.Observers).FirstAsync(x=>x.Id==id);
+            var @event = await _eventRepository.GetAll().Include(x => x.Observers).FirstAsync(x => x.Id == id);
             var publisher = new EventPublisher(@event);
             publisher.Attach(new EventUserModel(currentUserId));
             await _eventRepository.UpdateAsync(@event);
@@ -100,22 +101,22 @@ namespace EventManager.Controllers
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var @event = await _eventRepository.GetAll().Include(x => x.Observers).FirstAsync(x => x.Id == id);
             var sub = @event.Observers.FirstOrDefault(x => x.ObserverId == currentUserId);
-            if(sub != null)
+            if (sub != null)
             {
                 var publisher = new EventPublisher(@event);
                 publisher.Detach(sub);
                 await _eventRepository.UpdateAsync(@event);
             }
 
-           
+
             return RedirectToAction("Index");
         }
         public async Task<IActionResult> AddNotify(int id, string message)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var @event = await _eventRepository.GetAll().Include(x=>x.Observers).FirstOrDefaultAsync(x=>x.Id==id);
-           
-            if(currentUserId == @event.CreatorUserId)
+            var @event = await _eventRepository.GetAll().Include(x => x.Observers).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (currentUserId == @event.CreatorUserId)
             {
                 var publisher = new EventPublisher(@event);
                 publisher.SendNotify(message);
@@ -137,7 +138,7 @@ namespace EventManager.Controllers
         public async Task<IActionResult> UserEvents()
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result =await  _eventRepository.GetAll()
+            var result = await _eventRepository.GetAll()
                 .Include(x => x.Address)
                 .Where(x => x.CreatorUserId == currentUserId)
                 .OrderByDescending(x => x.CreationTime).ToListAsync();
@@ -149,14 +150,14 @@ namespace EventManager.Controllers
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _eventRepository.GetAll()
                 .Include(x => x.Address)
-                .Include(x=>x.Observers)
-                .Where(x => x.Observers.Any(x=>x.ObserverId==currentUserId))
+                .Include(x => x.Observers)
+                .Where(x => x.Observers.Any(x => x.ObserverId == currentUserId))
                 .OrderByDescending(x => x.CreationTime).ToListAsync();
             var output = _mapper.Map<List<GetEventDto>>(result);
             output.ForEach(x => x.Observers.Clear());
             return View(output);
         }
-        public async Task<IActionResult> Edit (int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var @event = await _eventRepository.GetAll().Include(x => x.Address).FirstOrDefaultAsync(x => x.Id == id);
             if (@event != null)
@@ -168,12 +169,36 @@ namespace EventManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(CreateOrUpdateEventDto model)
         {
-
-            var @event = _mapper.Map<EventModel>(model);
-            var resultHandler = new ResultHandler<EventModel>(null);
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var roleName = User.FindFirstValue(ClaimTypes.Role);
+            var actual = await _eventRepository.GetAll().Include(x => x.Address).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var @event = _mapper.Map<CreateOrUpdateEventDto, EventModel>(model, actual);
+            var resultHandler = new ResultHandler(null);
+            var audithandlar = new UpdateAuditHandler(resultHandler, currentUserId);
+            var validationHandler = new ValidationEventHandler(audithandlar);
+            var authorizeHandler = new AuthorizationHandler(validationHandler, currentUserId, roleName);
+            authorizeHandler.Handle(@event);
+            await _eventRepository.UpdateAsync(@event);
             return RedirectToAction("Index");
 
         }
-
+        public async Task<IActionResult> Create()
+        {
+            return View(new CreateOrUpdateEventDto());
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateOrUpdateEventDto model)
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var roleName = User.FindFirstValue(ClaimTypes.Role);
+            var @event = _mapper.Map<EventModel>(model);
+            var resultHandler = new ResultHandler(null);           
+            var validationHandler = new ValidationEventHandler(resultHandler);
+            var authorizeHandler = new AuthorizationHandler(validationHandler, currentUserId, roleName);
+            authorizeHandler.Handle(@event);
+            await _eventRepository.InsertAsync(@event);
+            return RedirectToAction("Index");
+        }
     }
 }

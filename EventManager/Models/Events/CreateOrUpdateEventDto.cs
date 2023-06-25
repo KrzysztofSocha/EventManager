@@ -3,7 +3,7 @@ using EventManager.Data.Entities;
 
 namespace EventManager.Models.Events
 {
-    [AutoMap(typeof(EventModel))]
+    
     public class CreateOrUpdateEventDto
     {
         public int? Id { get; set; }

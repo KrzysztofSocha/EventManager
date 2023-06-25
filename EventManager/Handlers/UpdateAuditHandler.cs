@@ -2,14 +2,14 @@
 
 namespace EventManager.Handlers
 {
-    public class UpdateAuditHandler<TModel> : BaseHandler<TModel>
+    public class UpdateAuditHandler : BaseHandler
     {
         private string CurrentUserId;
-        public UpdateAuditHandler(IHandler<TModel> next, string userId) : base(next)
+        public UpdateAuditHandler(IHandler next, string userId) : base(next)
         {
             CurrentUserId = userId;
         }
-        public override void Handle(TModel model)
+        public override void Handle(object model)
         {
             
             if (model is IHasModificationAudited)

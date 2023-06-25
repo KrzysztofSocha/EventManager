@@ -1,7 +1,7 @@
 ﻿namespace EventManager.Handlers
 {
-    public interface IHandler<TModel>
+    public interface IHandler
     {
-        void Handle(TModel model);
+        void Handle(object model);
     }
 }

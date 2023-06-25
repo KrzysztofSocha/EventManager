@@ -1,12 +1,12 @@
 ﻿namespace EventManager.Handlers
 {
-    public class ResultHandler<TModel> : BaseHandler<TModel>
+    public class ResultHandler : BaseHandler
     {
-        public ResultHandler(IHandler<TModel> next) : base(next)
+        public ResultHandler(IHandler next) : base(next)
         {
 
         }
-        public override void Handle(TModel model)
+        public override void Handle(object model)
         {
             
         }

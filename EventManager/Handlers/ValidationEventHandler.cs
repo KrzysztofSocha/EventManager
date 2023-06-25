@@ -4,23 +4,27 @@ using NuGet.Protocol.Core.Types;
 
 namespace EventManager.Handlers
 {
-    public class ValidationEventHandler<TModel> : BaseHandler<TModel> where TModel: EventModel
+    public class ValidationEventHandler : BaseHandler
     {
-        public ValidationEventHandler(IHandler<TModel> next):base(next)
+        public ValidationEventHandler(IHandler next ):base(next)
         {
         }
-        public override void Handle(TModel model)
+        public override async void Handle(object model)
         {
-            if (model.FinishTime < model.StartTime || model.FinishTime < DateTime.Now)
-                throw new Exception("Not correct finish time");
-            if(model.StartTime < DateTime.Now)
-                throw new Exception("Not correct start time");
-            if(string.IsNullOrEmpty(model.Name))
-                throw new Exception("Name cannot be null or empty");
-            if (string.IsNullOrEmpty(model.Address.City))
-                throw new Exception("City cannot be null or empty");
-            _next.Handle(model);
-            return;
+            if (model is EventModel eventModel)
+            {
+
+                if (eventModel.FinishTime < eventModel.StartTime || eventModel.FinishTime < DateTime.Now)
+                    eventModel.FinishTime = null;
+                if (eventModel.StartTime < DateTime.Now)
+                    throw new Exception("Not correct start time");
+                if (string.IsNullOrEmpty(eventModel.Name))
+                    throw new Exception("Name cannot be null or empty");
+                if (string.IsNullOrEmpty(eventModel.Address.City))
+                    throw new Exception("City cannot be null or empty");
+                _next.Handle(model);                
+                return;
+            }
         }
     }
 }
